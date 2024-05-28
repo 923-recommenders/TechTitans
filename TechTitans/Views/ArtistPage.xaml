@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--import pt Components namesapace ca sa putem refolosi componente (this some DRY shit)
+    asta e syntaxa: xmlns:controls="clr-namespace:TechTitans.Views.Components"-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:custom="clr-namespace:TechTitans.Views.Components"
+             x:Class="TechTitans.Views.ArtistPage"
+             Title="Welcome DummyArtist69!">
+    <VerticalStackLayout>
+        <Label 
+            Text="Your Top Songs"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" 
+            FontAttributes="Bold"
+            FontSize="16"
+            Margin="10,0,0,0"
+        />
+        <BoxView Color="#6E6E6E" HeightRequest="2" HorizontalOptions="FillAndExpand" Margin="10,5"/>
+        <VerticalStackLayout Spacing="15" Padding="10, 0">
+            <Grid x:Name="SongsGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
