@@ -17,8 +17,7 @@ public partial class UserPage : ContentPage
         UserService userService=new UserService();
 
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "https://localhost:7025/SongDatabaseModel/User";
-
+        private readonly string _baseUrl = "https://localhost:7025/SongDatabaseModel/";
     public class Song
     {
         public int SongId { get; set; }
