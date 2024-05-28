@@ -4,18 +4,13 @@ using TechTitans.Views.Components;
 using TechTitans.Models;
 using TechTitans.Repositories;
 using TechTitans.Services;
+using Microsoft.Maui.Controls;
+using System;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
+using System.Threading.Tasks;
 
-public class Song
-{
-    public int SongId { get; set; }
-    public string ArtistName { get; set; }
-    public string Name { get; set; }
-    public string Genre { get; set; }
-    public string Subgenre { get; set; }
-    public string Language { get; set; }
-    public string Country { get; set; }
-    public bool IsExplicit { get; set; }
-}
 
 public partial class UserPage : ContentPage
     {
@@ -23,145 +18,63 @@ public partial class UserPage : ContentPage
 
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = "https://localhost:7025/SongDatabaseModel/User";
-    
+
+    public class Song
+    {
+        public int SongId { get; set; }
+        public string ArtistName { get; set; }
+        public string Name { get; set; }
+        public string Genre { get; set; }
+        public string Subgenre { get; set; }
+        public string Language { get; set; }
+        public string Country { get; set; }
+        public bool IsExplicit { get; set; }
+    }
+    public List<Song> Songs { get; set; }
+
+    public Song SelectedSong { get; set; }
+
     public UserPage()
         {
 
-            InitializeComponent();
-            LoadSongs(); //here we load the most recently played songs
-            LoadSongRecommandation(); //here we load song recommandation
-            LoadAdvertisedSongs(); //here we load song advertised
-        }
-    private void LoadSongs()
-    {
-        var songs = userService.get_recently_played(); // Get your list of most recently played songs from somewhere (e.g., database, API, local storage)
-
-        // Loop through each song and dynamically create SongItem controls
-        int rowIndex = 0;
-        int columnIndex = 0;
-        SongsGrid.RowDefinitions.Add(new RowDefinition());
-        foreach (var song in songs)
-        {
-            var songItem = new SongItem(); // Create a new instance of SongItem
-            songItem.BindingContext = song; // Set the song as the binding context of the SongItem
-            songItem.Margin = new Thickness(0, 5, 0, 5); // Set margin as needed
-
-            // Add TapGestureRecognizer to handle tap event
-            var tapGestureRecognizer = new TapGestureRecognizer();
-            tapGestureRecognizer.Tapped += SongItem_Tapped;
-            songItem.GestureRecognizers.Add(tapGestureRecognizer);
-
-            // Set the row and column of the SongItem in the grid
-            Grid.SetRow(songItem, rowIndex);
-            Grid.SetColumn(songItem, columnIndex);
-            // Add the SongItem to the grid
-            SongsGrid.Children.Add(songItem);
-            columnIndex++;
-            if (columnIndex == 2)
-            {
-                columnIndex = 0;
-                rowIndex++;
-                SongsGrid.RowDefinitions.Add(new RowDefinition());
-            }
-        }
+        InitializeComponent();
+        BindingContext = this;
+        _httpClient = new HttpClient();
+        LoadSongs();
     }
-        private void LoadAdvertisedSongs()
+    private async void LoadSongs()
+    {
+        try
         {
-            var songs = GetSongs(); // Get your list of recommended songs from somewhere (e.g., database, API, local storage)
-            //for now we use the same mock function for retreving songs for frontend building purposes
-            // Loop through each song and dynamically create SongItem controls
-            int rowIndex = 0;
-            int columnIndex = 0;
-            SongsAdvertisedGrid.RowDefinitions.Add(new RowDefinition());
-            foreach (var song in songs)
+            // Make GET request to the API
+            var response = await _httpClient.GetFromJsonAsync<List<Song>>(_baseUrl);
+
+            if (response != null)
             {
-                var songItem = new SongItem(); // Create a new instance of SongItem
-                songItem.BindingContext = song; // Set the song as the binding context of the SongItem
-                songItem.Margin = new Thickness(0, 5, 0, 5); // Set margin as needed
-
-                // Add TapGestureRecognizer to handle tap event
-                var tapGestureRecognizer = new TapGestureRecognizer();
-                tapGestureRecognizer.Tapped += SongItem_Tapped;
-                songItem.GestureRecognizers.Add(tapGestureRecognizer);
-
-                // Set the row and column of the SongItem in the grid
-                Grid.SetRow(songItem, rowIndex);
-                Grid.SetColumn(songItem, columnIndex);
-                // Add the SongItem to the grid
-                SongsAdvertisedGrid.Children.Add(songItem);
-                columnIndex++;
-                if (columnIndex == 2)
-                {
-                    columnIndex = 0;
-                    rowIndex++;
-                    SongsAdvertisedGrid.RowDefinitions.Add(new RowDefinition());
-                }
+                Songs = response;
+                await DisplayAlert("New User Information", Newtonsoft.Json.JsonConvert.SerializeObject(response), "OK");
+                OnPropertyChanged(nameof(Songs));
+            }
+            else
+            {
+                // Handle error response
+                await DisplayAlert("Error", "Failed to fetch songs", "OK");
             }
         }
-    private void LoadSongRecommandation()
-    {
-        var songs = GetSongs(); // Get your list of recommended songs from somewhere (e.g., database, API, local storage)
-                                //for now we use the same mock function for retreving songs for frontend building purposes
-                                //note: we will need multiple sql commands for retriving different type of recommandations
-                                // Loop through each song and dynamically create SongItem controls
-        int rowIndex = 0;
-        int columnIndex = 0;
-        SongsRecommandationGrid.RowDefinitions.Add(new RowDefinition());
-        foreach (var song in songs)
+        catch (Exception ex)
         {
-            var songItem = new SongItem(); // Create a new instance of SongItem
-            songItem.BindingContext = song; // Set the song as the binding context of the SongItem
-            songItem.Margin = new Thickness(0, 5, 0, 5); // Set margin as needed
-
-            // Add TapGestureRecognizer to handle tap event
-            var tapGestureRecognizer = new TapGestureRecognizer();
-            tapGestureRecognizer.Tapped += SongItem_Tapped;
-            songItem.GestureRecognizers.Add(tapGestureRecognizer);
-
-            // Set the row and column of the SongItem in the grid
-            Grid.SetRow(songItem, rowIndex);
-            Grid.SetColumn(songItem, columnIndex);
-            // Add the SongItem to the grid
-            SongsRecommandationGrid.Children.Add(songItem);
-            columnIndex++;
-            if (columnIndex == 2)
-            {
-                columnIndex = 0;
-                rowIndex++;
-                SongsRecommandationGrid.RowDefinitions.Add(new RowDefinition());
-            }
+            // Handle exception
+            await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
         }
     }
 
-
-
-    private void SongItem_Tapped(object sender, System.EventArgs e)
+    private void songListView_ItemTapped(object sender, ItemTappedEventArgs e)
     {
-        // open ArtistSongDashboard page with song details
-        var songItem = (SongItem)sender;
-        var songInfo = songItem.BindingContext as SongBasicInfo;
-        Navigation.PushAsync(new UserSongDashboard(songInfo));
-    }
-
-    private List<SongBasicInfo> GetSongs()
-    {
-        // Creating a list of strings
-        List<string> features = new List<string>();
-
-        // Adding strings to the list
-        features.Add("feature1");
-
-        // mocked songs, to be replaced with actual data retrieval from db
-        return new List<SongBasicInfo>
-            {
-                
-                new SongBasicInfo { SongId = 0, Name = "Song 1", Artist = "Artist 1", Image = "song_img_default.png", Genre="genre", Subgenre="subgenre", Country="country", Language="language", Album="album", Features=features },
-                new SongBasicInfo { SongId = 1, Name = "Song 2", Artist = "Artist 2", Image = "song_img_default.png", Genre="genre", Subgenre="subgenre", Country="country", Language="language", Album="album", Features=features },
-                new SongBasicInfo { SongId = 2, Name = "Song 3", Artist = "Artist 3", Image = "song_img_default.png", Genre="genre", Subgenre="subgenre", Country="country", Language="language", Album="album", Features=features },
-                new SongBasicInfo {SongId = 3, Name = "Song 4", Artist = "Artist 4", Image = "song_img_default.png", Genre = "genre", Subgenre = "subgenre", Country = "country", Language = "language", Album = "album", Features = features},
-                new SongBasicInfo { SongId = 4, Name = "Song 5", Artist = "Artist 5", Image = "song_img_default.png", Genre="genre", Subgenre="subgenre", Country="country", Language="language", Album="album", Features=features },
-                new SongBasicInfo {SongId = 5, Name = "Song 6", Artist = "Artist 6", Image = "song_img_default.png", Genre = "genre", Subgenre = "subgenre", Country = "country", Language = "language", Album = "album", Features = features},
-            };
+        if (e.Item is Song selectedSong)
+        {
+            SelectedSong = selectedSong;
+            songDetailsLayout.IsVisible = true;
+        }
     }
 
 }

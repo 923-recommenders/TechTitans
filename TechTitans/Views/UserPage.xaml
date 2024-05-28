@@ -10,59 +10,27 @@
              Title="UserPage">
     <ScrollView>
         <VerticalStackLayout>
-            <custom_user:SearchSongsButton/>
-            <Label 
-                Text="Your Most Listened Songs"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" 
-                FontAttributes="Bold"
-                FontSize="16"
-                Margin="10,0,0,0"
-            />
-            <BoxView Color="#6E6E6E" HeightRequest="2" HorizontalOptions="FillAndExpand" Margin="10,5" />
-            <VerticalStackLayout Spacing="15" Padding="10, 0">
-                <Grid x:Name="SongsGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                </Grid>
-            </VerticalStackLayout>
-            <Label 
-                Text="Recommended Songs"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" 
-                FontAttributes="Bold"
-                FontSize="16"
-                Margin="10,0,0,0"
-            />
-            <BoxView Color="#6E6E6E" HeightRequest="2" HorizontalOptions="FillAndExpand" Margin="10,5"/>
-            <VerticalStackLayout Spacing="15" Padding="10, 0">
-                <Grid x:Name="SongsRecommandationGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                </Grid>
-            </VerticalStackLayout>
-            <Label 
-                Text="Advertised Songs"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" 
-                FontAttributes="Bold"
-                FontSize="16"
-                Margin="10,0,0,0"
-            />
-            <BoxView Color="#6E6E6E" HeightRequest="2" HorizontalOptions="FillAndExpand" Margin="10,5"/>
-            <VerticalStackLayout Spacing="15" Padding="10, 0">
-                <Grid x:Name="SongsAdvertisedGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                </Grid>
-            </VerticalStackLayout>
-        </VerticalStackLayout>
+            <!-- Header -->
+            <Label Text="Songs" FontSize="Large" HorizontalOptions="Center" Margin="0,20,0,10" />
 
+            <!-- Song List -->
+            <ListView x:Name="songListView" ItemsSource="{Binding Songs}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Name}" Detail="{Binding ArtistName}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- Song Details -->
+            <StackLayout x:Name="songDetailsLayout" IsVisible="False">
+                <Label Text="Song Details" FontSize="Large" HorizontalOptions="Center" Margin="0,20,0,10" />
+                <Label Text="Name: " />
+                <Label Text="{Binding SelectedSong.Name}" />
+                <Label Text="Artist: " />
+                <Label Text="{Binding SelectedSong.ArtistName}" />
+                <!-- Add more details as needed -->
+            </StackLayout>
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
